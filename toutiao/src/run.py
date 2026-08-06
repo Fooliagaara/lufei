@@ -11,6 +11,8 @@ parser = argparse.ArgumentParser(description="Chinese Text Classification")
 parser.add_argument("--model", type=str, required=True, help="choose a model: bert")
 args = parser.parse_args()
 
+# 启动方式 python run.py --model bert
+
 
 if __name__ == "__main__":
     dataset = "toutiao"  # 数据集
