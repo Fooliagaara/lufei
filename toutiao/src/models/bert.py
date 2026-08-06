@@ -53,6 +53,3 @@ class Model(nn.Module):
 
         return out
 
-
-if __name__ == '__main__':
-    print("hello")
