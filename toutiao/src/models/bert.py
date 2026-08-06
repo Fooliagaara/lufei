@@ -52,3 +52,7 @@ class Model(nn.Module):
         out = self.fc(pooled)
 
         return out
+
+
+if __name__ == '__main__':
+    print("hello")
