@@ -17,3 +17,11 @@ class Banana(Fruit):
         self.name = "banana"
         self.price = price
 
+
+class Oranges(Fruit):
+    def __init__(self, name, price):
+        super().__init__(name, price)
+        self.name = "oranges"
+        self.price = price
+
+
