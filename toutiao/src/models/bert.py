@@ -27,6 +27,7 @@ class Config(object):
         self.batch_size = 128  # mini-batch大小
         self.pad_size = 32  # 每句话处理成的长度(短填长切)
         self.learning_rate = 2e-5  # 学习率
+        self.dropout = 0.1  # dropout概率
         self.bert_path = "../data/bert_pretrain"
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
         self.bert_config = BertConfig.from_pretrained(self.bert_path + '/bert_config.json')
@@ -37,7 +38,7 @@ class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
         self.bert = BertModel.from_pretrained(config.bert_path, config=config.bert_config)
-
+        self.dropout = nn.Dropout(config.dropout)
         self.fc = nn.Linear(config.hidden_size, config.num_classes)
 
     def forward(self, x):
@@ -49,6 +50,7 @@ class Model(nn.Module):
         # 修复解包bug
         bert_out = self.bert(context, attention_mask=mask)
         pooled = bert_out.pooler_output  # CLS向量 [batch, hidden_size]
+        pooled = self.dropout(pooled)
         out = self.fc(pooled)
 
         return out
