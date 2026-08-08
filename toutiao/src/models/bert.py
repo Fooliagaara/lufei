@@ -18,8 +18,12 @@ class Config(object):
         self.save_path = "../saved_dict"
         if not os.path.exists(self.save_path):
             os.mkdir(self.save_path)
+        self.save_path_quantization = self.save_path + "/" + self.model_name + "_quantized.pt"
         self.save_path += "/" + self.model_name + ".pt"  # 模型训练结果
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 设备
+        # 模型训练+预测的时候, 放开下一行代码, 在GPU上运行.
+        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 设备
+        # 模型量化的时候, 放开下一行代码, 在CPU上运行.
+        self.device = 'cpu'
 
         self.require_improvement = 1000  # 若超过1000batch效果还没提升，则提前结束训练
         self.num_classes = len(self.class_list)  # 类别数
