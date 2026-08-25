@@ -54,7 +54,6 @@ class Model(nn.Module):
         # 修复解包bug
         bert_out = self.bert(context, attention_mask=mask)
         pooled = bert_out.pooler_output  # CLS向量 [batch, hidden_size]
-        pooled = self.dropout(pooled)
         out = self.fc(pooled)
 
         return out
