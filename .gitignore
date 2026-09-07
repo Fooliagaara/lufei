@@ -16,3 +16,6 @@ venv/
 toutiao/data/bert_pretrain/
 toutiao/data/albert_pretrain/
 lesson_pytorch/model/
+# 数据文件
+lesson_NLP/fil9
+*.tsv
