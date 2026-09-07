@@ -1,0 +1,18 @@
+__pycache__/
+venv/
+*.csv
+*.txt
+*.log
+*.pyc
+# 模型权重、二进制
+*.bin
+*.pth
+*.pkl
+*.zip
+*.rar
+*.7z
+*.pt
+# 预训练模型、训练保存的权重文件夹
+toutiao/data/bert_pretrain/
+toutiao/data/albert_pretrain/
+lesson_pytorch/model/

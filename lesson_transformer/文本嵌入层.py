@@ -3,7 +3,6 @@ import torch.nn as nn
 import math
 
 
-
 # 定义Embeddings类来实现文本嵌入层，这里s说明代表两个一模一样的嵌入层, 他们共享参数.
 # 该类继承nn.Module, 这样就有标准层的一些功能, 这里我们也可以理解为一种模式, 我们自己实现的所有层都会这样去写.
 class Embeddings(nn.Module):

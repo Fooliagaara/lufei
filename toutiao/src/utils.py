@@ -33,7 +33,7 @@ def build_dataset(config):
                     continue
                 content, label = line.split("\t")
                 token = config.tokenizer.tokenize(content)
-                token = ["CLS"] + token
+                token = ["[CLS]"] + token
                 seq_len = len(token)
                 mask = []
                 token_ids = config.tokenizer.convert_tokens_to_ids(token)
@@ -73,7 +73,7 @@ class DatasetIterater(object):
 
         # pad前的长度(超过pad_size的设为pad_size)
         seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        if self.model_name == "bert" or self.model_name == "multi_task_bert":
+        if self.model_name == "bert" or self.model_name == "multi_task_bert" or self.model_name == "albert":
             mask = torch.LongTensor([_[3] for _ in datas]).to(self.device)
             return (x, seq_len, mask), y
 

@@ -2,12 +2,12 @@
 import torch
 import torch.nn as nn
 import os
-from transformers import BertModel, BertTokenizer, BertConfig
+from transformers import AlbertModel, BertTokenizer, AlbertConfig
 
 
 class Config(object):
     def __init__(self, dataset):
-        self.model_name = "bert"
+        self.model_name = "albert"
         self.data_path = "../data/data/"
         self.train_path = self.data_path + "train.txt"  # 训练集
         self.dev_path = self.data_path + "dev.txt"  # 验证集
@@ -21,9 +21,9 @@ class Config(object):
         self.save_path_quantization = self.save_path + "/" + self.model_name + "_quantized.pt"
         self.save_path += "/" + self.model_name + ".pt"  # 模型训练结果
         # 模型训练+预测的时候, 放开下一行代码, 在GPU上运行.
-        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 设备
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 设备
         # 模型量化的时候, 放开下一行代码, 在CPU上运行.
-        self.device = 'cpu'
+        # self.device = 'cpu'
 
         self.require_improvement = 1000  # 若超过1000batch效果还没提升，则提前结束训练
         self.num_classes = len(self.class_list)  # 类别数
@@ -32,19 +32,21 @@ class Config(object):
         self.pad_size = 32  # 每句话处理成的长度(短填长切)
         self.learning_rate = 2e-5  # 学习率
         self.dropout = 0.1  # dropout概率
-        self.bert_path = "../data/bert_pretrain"
-        self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
-        self.bert_config = BertConfig.from_pretrained(self.bert_path + '/bert_config.json')
-        self.hidden_size = 768
+        self.albert_path = "../data/albert_pretrain"
+        # clue/albert_chinese_tiny 用的是与 bert-base-chinese 相同的 WordPiece 词表(vocab.txt)
+        # 在 transformers 5.x 中 AlbertTokenizer 无法正确加载 vocab.txt, 故用 BertTokenizer 代替
+        self.tokenizer = BertTokenizer.from_pretrained(self.albert_path)
+        self.bert_config = AlbertConfig.from_pretrained(self.albert_path)
+        self.hidden_size = self.bert_config.hidden_size
 
 
 class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
-        self.bert = BertModel.from_pretrained(config.bert_path, config=config.bert_config)
+        self.bert = AlbertModel.from_pretrained(config.albert_path, config=config.bert_config)
         self.dropout = nn.Dropout(config.dropout)
 
-        # 将BERT中所有的参数层名字打印出来
+        # 将ALBERT中所有的参数层名字打印出来
         for name, param in self.bert.named_parameters():
             print(name)
 
@@ -56,10 +58,8 @@ class Model(nn.Module):
         # 对padding部分进行mask, 和句子一个size, padding部分用0表示, 比如[1, 1, 1, 1, 0, 0]
         mask = x[2]
 
-        # 修复解包bug
         bert_out = self.bert(context, attention_mask=mask)
         pooled = bert_out.pooler_output  # CLS向量 [batch, hidden_size]
         out = self.fc(pooled)
 
         return out
-
