@@ -7,8 +7,9 @@ import argparse
 from utils import build_dataset, build_iterator, get_time_dif
 
 
+
 parser = argparse.ArgumentParser(description="Chinese Text Classification")
-parser.add_argument("--model", type=str, required=True, help="choose a model: bert")
+parser.add_argument("--model", type=str, required=True, help="choose a model: bert, albert or t5")
 args = parser.parse_args()
 
 # 启动方式 python run.py --model bert
@@ -26,14 +27,8 @@ if __name__ == "__main__":
         torch.backends.cudnn.deterministic = True  # 保证每次结果一样
 
         print("Loading data for Bert Model...")
-        train_data, dev_data, test_data = build_dataset(config)
-        train_iter = build_iterator(train_data, config)
-        dev_iter = build_iterator(dev_data, config)
-        test_iter = build_iterator(test_data, config)
+        
 
-        model = x.Model(config).to(config.device)
-        train(config, model, train_iter, dev_iter)
-        test(config, model, test_iter)
     elif args.model == "albert":
         model_name = "albert"
         x = import_module("models." + model_name)
@@ -44,11 +39,23 @@ if __name__ == "__main__":
         torch.backends.cudnn.deterministic = True  # 保证每次结果一样
 
         print("Loading data for Albert Model...")
-        train_data, dev_data, test_data = build_dataset(config)
-        train_iter = build_iterator(train_data, config)
-        dev_iter = build_iterator(dev_data, config)
-        test_iter = build_iterator(test_data, config)
 
-        model = x.Model(config).to(config.device)
-        train(config, model, train_iter, dev_iter)
-        test(config, model, test_iter)
+    elif args.model == "T5" or args.model == "t5":
+        model_name = "t5"
+        x = import_module("models." + model_name)
+        config = x.Config(dataset)
+        np.random.seed(1)
+        torch.manual_seed(1)
+        torch.cuda.manual_seed_all(1)
+        torch.backends.cudnn.deterministic = True  # 保证每次结果一样
+
+        print("Loading data for T5 Model...")
+
+    train_data, dev_data, test_data = build_dataset(config)
+    train_iter = build_iterator(train_data, config)
+    dev_iter = build_iterator(dev_data, config)
+    test_iter = build_iterator(test_data, config)
+
+    model = x.Model(config).to(config.device)
+    train(config, model, train_iter, dev_iter)
+    test(config, model, test_iter)
