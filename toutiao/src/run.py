@@ -20,37 +20,28 @@ if __name__ == "__main__":
     if args.model == "bert":
         model_name = "bert"
         x = import_module("models." + model_name)
-        config = x.Config(dataset)
-        np.random.seed(1)
-        torch.manual_seed(1)
-        torch.cuda.manual_seed_all(1)
-        torch.backends.cudnn.deterministic = True  # 保证每次结果一样
-
-        print("Loading data for Bert Model...")
+        print("Loading data for ", model_name)
         
-
     elif args.model == "albert":
         model_name = "albert"
         x = import_module("models." + model_name)
-        config = x.Config(dataset)
-        np.random.seed(1)
-        torch.manual_seed(1)
-        torch.cuda.manual_seed_all(1)
-        torch.backends.cudnn.deterministic = True  # 保证每次结果一样
-
-        print("Loading data for Albert Model...")
+        print("Loading data for ", model_name)
 
     elif args.model == "T5" or args.model == "t5":
         model_name = "t5"
         x = import_module("models." + model_name)
-        config = x.Config(dataset)
-        np.random.seed(1)
-        torch.manual_seed(1)
-        torch.cuda.manual_seed_all(1)
-        torch.backends.cudnn.deterministic = True  # 保证每次结果一样
+        print("Loading data for ", model_name)
 
-        print("Loading data for T5 Model...")
+    elif args.model == "xlnet":
+        model_name = "xlnet"
+        x = import_module("models." + model_name)
+        print("Loading data for ", model_name)
 
+    config = x.Config(dataset)
+    np.random.seed(1)
+    torch.manual_seed(1)
+    torch.cuda.manual_seed_all(1)
+    torch.backends.cudnn.deterministic = True  # 保证每次结果一样
     train_data, dev_data, test_data = build_dataset(config)
     train_iter = build_iterator(train_data, config)
     dev_iter = build_iterator(dev_data, config)

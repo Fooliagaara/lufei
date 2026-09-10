@@ -14,7 +14,10 @@ venv/
 *.pt
 # 预训练模型、训练保存的权重文件夹
 toutiao/data/bert_pretrain/
-toutiao/data/albert_pretrain/
+toutiao/data/albert-tiny_pretrain/
+toutiao/data/t5-base_pretrain/
+toutiao/data/t5_chinese_pretrain/
+toutiao/data/xlnet_chinese_large/
 lesson_pytorch/model/
 # 数据文件
 lesson_NLP/fil9

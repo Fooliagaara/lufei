@@ -2,12 +2,13 @@
 import torch
 import torch.nn as nn
 import os
-from transformers import BertModel, BertTokenizer, BertConfig
+from transformers import XLNetTokenizer,XLNetModel,XLNetConfig
+
 
 
 class Config(object):
     def __init__(self, dataset):
-        self.model_name = "bert"
+        self.model_name = "xlnet"
         self.data_path = "../data/data/"
         self.train_path = self.data_path + "train.txt"  # 训练集
         self.dev_path = self.data_path + "dev.txt"  # 验证集
@@ -32,34 +33,39 @@ class Config(object):
         self.pad_size = 32  # 每句话处理成的长度(短填长切)
         self.learning_rate = 2e-5  # 学习率
         self.dropout = 0.1  # dropout概率
-        self.bert_path = "../data/bert_pretrain"
-        self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
-        self.bert_config = BertConfig.from_pretrained(self.bert_path + '/bert_config.json')
-        self.hidden_size = 768
+        self.xlnet_path = "../data/xlnet_chinese_large"
+
+        self.tokenizer = XLNetTokenizer.from_pretrained(self.xlnet_path)
+        self.xlnet_config = XLNetConfig.from_pretrained(self.xlnet_path)
+        self.hidden_size = self.xlnet_config.d_model
 
 
 class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
-        self.bert = BertModel.from_pretrained(config.bert_path, config=config.bert_config)
+        self.xlnet = XLNetModel.from_pretrained(config.xlnet_path, config=config.xlnet_config)
         self.dropout = nn.Dropout(config.dropout)
 
-        # 将BERT中所有的参数层名字打印出来
-        for name, param in self.bert.named_parameters():
-            print(name)
+        # 查看xlnet内部参数
+        # for name, param in self.xlnet.named_parameters():
+        #     print(name)
 
         self.fc = nn.Linear(config.hidden_size, config.num_classes)
 
     def forward(self, x):
-        # 输入的句子
-        context = x[0]
-        # 对padding部分进行mask, 和句子一个size, padding部分用0表示, 比如[1, 1, 1, 1, 0, 0]
-        mask = x[2]
+        # x[0]: input_ids [batch, seq_len]
+        # x[2]: padding mask (attention_mask, 1=有效token，0=pad)
+        input_ids = x[0]
+        attention_mask = x[2]
 
-        # 修复解包bug
-        bert_out = self.bert(context, attention_mask=mask)
-        pooled = bert_out.pooler_output  # CLS向量 [batch, hidden_size]
+        # XLNet 前向: 没有pooler_output, 输出last_hidden_state
+        xlnet_out = self.xlnet(input_ids=input_ids, attention_mask=attention_mask)
+        last_hidden = xlnet_out.last_hidden_state  # [batch, seq_len, d_model]
+
+        # 平均池化: 对非padding位置的向量求均值, 得到句向量 [batch, d_model]
+        mask_expanded = attention_mask.unsqueeze(-1).float()
+        pooled = (last_hidden * mask_expanded).sum(1) / mask_expanded.sum(1).clamp(min=1e-9)
+
         out = self.fc(pooled)
-
         return out
 

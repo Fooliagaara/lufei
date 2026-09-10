@@ -33,7 +33,7 @@ def build_dataset(config):
                     continue
                 content, label = line.split("\t")
                 token = config.tokenizer.tokenize(content)
-                if config.model_name != "t5":  # T5没有[CLS], 用平均池化, 不需要CLS
+                if config.model_name not in ("t5", "xlnet"):  # T5/XLNet没有[CLS], 用平均池化, 不需要CLS
                     token = ["[CLS]"] + token
                 seq_len = len(token)
                 mask = []
@@ -42,7 +42,7 @@ def build_dataset(config):
                 if pad_size:
                     if len(token) < pad_size:
                         mask = [1] * len(token_ids) + [0] * (pad_size - len(token))
-                        token_ids += [0] * (pad_size - len(token))
+                        token_ids += [config.tokenizer.pad_token_id] * (pad_size - len(token))
                     else:
                         mask = [1] * pad_size
                         token_ids = token_ids[:pad_size]
@@ -74,7 +74,7 @@ class DatasetIterater(object):
 
         # pad前的长度(超过pad_size的设为pad_size)
         seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        if self.model_name == "bert" or self.model_name == "multi_task_bert" or self.model_name == "albert" or self.model_name == "t5":
+        if self.model_name == "bert" or self.model_name == "multi_task_bert" or self.model_name == "albert" or self.model_name == "t5" or self.model_name == "xlnet":
             mask = torch.LongTensor([_[3] for _ in datas]).to(self.device)
             return (x, seq_len, mask), y
 
