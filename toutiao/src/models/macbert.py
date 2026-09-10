@@ -7,7 +7,7 @@ from transformers import BertModel, BertTokenizer, BertConfig
 
 class Config(object):
     def __init__(self, dataset):
-        self.model_name = "bert"
+        self.model_name = "macbert"
         self.data_path = "../data/data/"
         self.train_path = self.data_path + "train.txt"  # 训练集
         self.dev_path = self.data_path + "dev.txt"  # 验证集
@@ -34,8 +34,8 @@ class Config(object):
         self.dropout = 0.1  # dropout概率
         self.macbert_path = "../data/chinese-macbert-base"
         self.tokenizer = BertTokenizer.from_pretrained(self.macbert_path)
-        self.macbert_config = BertConfig.from_pretrained(self.macbert_path + '/config.json')
-        self.hidden_size = 768
+        self.macbert_config = BertConfig.from_pretrained(self.macbert_path)
+        self.hidden_size = self.macbert_config.hidden_size
 
 
 class Model(nn.Module):
@@ -43,10 +43,6 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.macbert = BertModel.from_pretrained(config.macbert_path, config=config.macbert_config)
         self.dropout = nn.Dropout(config.dropout)
-
-        # # 将MACBERT中所有的参数层名字打印出来
-        # for name, param in self.bert.named_parameters():
-        #     print(name)
 
         self.fc = nn.Linear(config.hidden_size, config.num_classes)
 
@@ -59,6 +55,7 @@ class Model(nn.Module):
         # 修复解包bug
         bert_out = self.macbert(context, attention_mask=mask)
         pooled = bert_out.pooler_output  # CLS向量 [batch, hidden_size]
+        pooled = self.dropout(pooled)
         out = self.fc(pooled)
 
         return out

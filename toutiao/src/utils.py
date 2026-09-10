@@ -74,7 +74,8 @@ class DatasetIterater(object):
 
         # pad前的长度(超过pad_size的设为pad_size)
         seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        if self.model_name == "bert" or self.model_name == "multi_task_bert" or self.model_name == "albert" or self.model_name == "t5" or self.model_name == "xlnet":
+        if self.model_name == "bert" or self.model_name == "multi_task_bert" or self.model_name == "albert" \
+        or self.model_name == "t5" or self.model_name == "xlnet" or self.model_name == "macbert":
             mask = torch.LongTensor([_[3] for _ in datas]).to(self.device)
             return (x, seq_len, mask), y
 

@@ -37,6 +37,11 @@ if __name__ == "__main__":
         x = import_module("models." + model_name)
         print("Loading data for ", model_name)
 
+    elif args.model == "macbert":
+        model_name = "macbert"
+        x = import_module("models." + model_name)
+        print("Loading data for ", model_name)
+
     config = x.Config(dataset)
     np.random.seed(1)
     torch.manual_seed(1)
