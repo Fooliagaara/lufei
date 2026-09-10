@@ -22,3 +22,4 @@ lesson_pytorch/model/
 # 数据文件
 lesson_NLP/fil9
 *.tsv
+.idea/
