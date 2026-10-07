@@ -6,5 +6,5 @@ class_list = [
     x.strip() for x in open(data_path + "class.txt").readlines()
 ]  # 类别名单
 
-
+print("hello world")
 print("ni hao")

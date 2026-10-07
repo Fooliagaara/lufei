@@ -23,3 +23,8 @@ lesson_pytorch/model/
 lesson_NLP/fil9
 *.tsv
 .idea/
+
+# macOS Finder 自动生成的文件，对项目代码没有意义
+.DS_Store
+# vscode 配置文件夹
+.vscode/
