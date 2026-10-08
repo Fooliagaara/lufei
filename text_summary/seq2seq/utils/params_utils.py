@@ -1,0 +1,27 @@
+import argparse
+
+def get_params():
+    parser = argparse.ArgumentParser()
+    # 编码器和解码器的最⼤序列⻓度
+    parser.add_argument('--model_enc_len', default=300, help="Encoder input max Sequence length", type=int)
+    parser.add_argument('--max_dec_len', default=50, help='Decoder input max Sequence length', type=int)
+    # ⼀个训练批次的⼤⼩
+    parser.add_argument('--batch_size', default=64, help="Batch size", type=int)
+    # seq2seq训练轮数
+    parser.add_argument('--seq2seq_train_epochs', default=20, help='Seq2Seq model training epochs', type=int)
+    # 词嵌⼊⼤⼩        
+    parser.add_argument('--embed_size',default=500, help='Words embeddings dimension',  type=int)
+    # 编码器、解码器以及attention的隐含层单元数
+    parser.add_argument("--enc_units", default=512, help="Encoder GRU cell units number", type=int)
+    parser.add_argument("--dec_units", default=512, help="Decoder GRU cell units number", type=int)
+    parser.add_argument("--attn_units", default=20, help="Used to compute the attention weights", type=int)
+    # 学习率
+    parser.add_argument("--learning_rate", default=0.001, help="Learning rate", type=float)
+    args = parser.parse_args()
+    # param是⼀个字典类型的变量，键为参数名，值为参数值
+    params = vars(args)
+    return params
+
+if __name__ == "__main__":
+    res = get_params()
+    print(res)
